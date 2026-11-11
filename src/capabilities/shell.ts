@@ -65,8 +65,9 @@ function exec(file: string, args: string[], o: { cwd: string; timeoutMs: number;
     const child = spawn(file, args, { cwd: o.cwd, shell: false, detached: posix, stdio: ["pipe", "pipe", "pipe"], windowsHide: true });
     const out: Buffer[] = [];
     const err: Buffer[] = [];
-    let outLen = 0, errLen = 0, truncated = false, timedOut = false, done = false;
+    let outLen = 0, errLen = 0, truncated = false, timedOut = false, done = false, killed = false;
     const kill = () => {
+      killed = true;
       try {
         if (posix && child.pid) process.kill(-child.pid, "SIGKILL");
         else child.kill("SIGKILL");
@@ -79,8 +80,10 @@ function exec(file: string, args: string[], o: { cwd: string; timeoutMs: number;
       into.push(buf);
       return len + buf.length;
     };
-    child.stdout.on("data", (b: Buffer) => { outLen = take(b, out, outLen); });
-    child.stderr.on("data", (b: Buffer) => { errLen = take(b, err, errLen); });
+    // Once we have killed the group, drop anything still arriving: on macOS a shell can survive the
+    // group SIGKILL long enough to run its next command, and that output must not leak past the timeout/abort.
+    child.stdout.on("data", (b: Buffer) => { if (!killed) outLen = take(b, out, outLen); });
+    child.stderr.on("data", (b: Buffer) => { if (!killed) errLen = take(b, err, errLen); });
     const timer = setTimeout(() => { timedOut = true; kill(); }, o.timeoutMs);
     const onAbort = () => kill();
     signal.addEventListener("abort", onAbort, { once: true });
