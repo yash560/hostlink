@@ -59,7 +59,7 @@ describe("shell capability", () => {
     const env = await setup();
     try {
       const { agent, deviceId } = await linkAgent(env, { capabilities: [shellCapability()] });
-      const r = await env.hl.call({ ownerId: "u1", deviceId, cap: "shell", method: "run", params: { command: ["node", "-e", "console.log(6*7)"] } });
+      const r = await env.hl.call({ ownerId: "u1", deviceId, cap: "shell", method: "run", params: { command: [process.execPath, "-e", "console.log(6*7)"] } });
       assert.equal(r.stdout, "42\n");
       await agent.stop();
     } finally { await env.close(); }
