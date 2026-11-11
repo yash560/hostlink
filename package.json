@@ -1,0 +1,79 @@
+{
+  "name": "hostlink",
+  "version": "0.1.0",
+  "description": "Securely link a local machine (browser, shell, custom tools) to a cloud agent. Device-code pairing, Ed25519 device keys, scoped and time-limited grants, outbound-only WebSocket.",
+  "license": "MIT",
+  "author": "Yash Jain",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yash560/hostlink.git"
+  },
+  "homepage": "https://github.com/yash560/hostlink#readme",
+  "bugs": {
+    "url": "https://github.com/yash560/hostlink/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20.3"
+  },
+  "bin": {
+    "hostlink": "dist/cli/main.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./agent": {
+      "types": "./dist/agent/index.d.ts",
+      "default": "./dist/agent/index.js"
+    },
+    "./capabilities": {
+      "types": "./dist/capabilities/index.d.ts",
+      "default": "./dist/capabilities/index.js"
+    },
+    "./protocol": {
+      "types": "./dist/protocol.d.ts",
+      "default": "./dist/protocol.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SECURITY.md",
+    "PROTOCOL.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json && chmod +x dist/cli/main.js",
+    "test": "npm run build && node --test --test-concurrency=1 test/*.test.mjs",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "playwright-core": "^1.50.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.12",
+    "typescript": "^5.6.0"
+  },
+  "keywords": [
+    "agent",
+    "remote",
+    "device",
+    "pairing",
+    "browser-automation",
+    "websocket",
+    "ed25519",
+    "device-code"
+  ]
+}
