@@ -59,7 +59,8 @@ describe("shell capability", () => {
     const env = await setup();
     try {
       const { agent, deviceId } = await linkAgent(env, { capabilities: [shellCapability()] });
-      const r = await env.hl.call({ ownerId: "u1", deviceId, cap: "shell", method: "run", params: { command: [process.execPath, "-e", "console.log(6*7)"] } });
+      const r = await env.hl.call({ ownerId: "u1", deviceId, cap: "shell", method: "run", params: { command: [process.execPath, "-e", "process.stdout.write(String(6*7) + '\\n')"] } });
+      // A string, not console.log(number): from a TTY the test runner sets FORCE_COLOR and numbers come back ANSI-colored.
       assert.equal(r.stdout, "42\n");
       await agent.stop();
     } finally { await env.close(); }
